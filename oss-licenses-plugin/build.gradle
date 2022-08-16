@@ -10,6 +10,7 @@ dependencies {
     implementation 'com.android.tools.build:gradle:7.1.0'
     implementation 'com.android.tools.build:gradle-api:7.1.0'
     implementation 'com.google.protobuf:protobuf-java:3.19.1'
+    implementation 'org.apache.commons:commons-csv:1.9.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:4.1.0'
     testImplementation 'com.google.guava:guava:31.0.1-jre'
@@ -20,34 +21,7 @@ dependencies {
 group = 'com.google.android.gms'
 version = '0.10.5'
 
-apply plugin: 'maven'
-
 repositories {
     google()
     mavenCentral()
-}
-
-// upload and build in local
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri('../repo'))
-            pom.project {
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-
-            }
-        }
-    }
-}
-
-// generate zip file for android maven release tool
-task packageFiles(type: Zip, dependsOn: 'uploadArchives') {
-    def groupDir = rootProject.group.replaceAll('\\.', '/')
-    from("../repo/$groupDir/$rootProject.name/$rootProject.version/")
 }

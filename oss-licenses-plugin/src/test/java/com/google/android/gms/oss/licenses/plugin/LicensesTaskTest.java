@@ -67,6 +67,7 @@ public class LicensesTaskTest {
     File outputDir = temporaryFolder.newFolder();
     File outputLicenses = new File(outputDir, "testLicenses");
     File outputMetadata = new File(outputDir, "testMetadata");
+    File outputMetadataCsv = new File(outputDir, "testMetadataCsv");
 
     project = ProjectBuilder.builder().withProjectDir(new File(BASE_DIR)).build();
     licensesTask = project.getTasks().create("generateLicenses", LicensesTask.class);
@@ -74,6 +75,7 @@ public class LicensesTaskTest {
     licensesTask.setRawResourceDir(outputDir);
     licensesTask.setLicenses(outputLicenses);
     licensesTask.setLicensesMetadata(outputMetadata);
+    licensesTask.setLicensesMetadataCsv(outputMetadataCsv);
   }
 
   @Test
@@ -116,8 +118,10 @@ public class LicensesTaskTest {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
-    licensesTask.addLicensesFromPom(deps1, group1, name1);
+    String version1 = "1";
+    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
 
+    assertTrue(licensesTask.getLicenses().exists());
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected = "http://www.opensource.org/licenses/mit-license.php" + LINE_BREAK;
     assertTrue(licensesTask.licensesMap.containsKey("groupA:deps1"));
@@ -129,12 +133,14 @@ public class LicensesTaskTest {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
-    licensesTask.addLicensesFromPom(deps1, group1, name1);
+    String version1 = "1";
+    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
 
     File deps2 = getResourceFile("dependencies/groupB/bcd/deps2.pom");
     String name2 = "deps2";
     String group2 = "groupB";
-    licensesTask.addLicensesFromPom(deps2, group2, name2);
+    String version2 = "1";
+    licensesTask.addLicensesFromPom(deps2, group2, name2, version2);
 
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected =
@@ -154,12 +160,14 @@ public class LicensesTaskTest {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
-    licensesTask.addLicensesFromPom(deps1, group1, name1);
+    String version1 = "1";
+    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
 
     File deps2 = getResourceFile("dependencies/groupE/deps5.pom");
     String name2 = "deps5";
     String group2 = "groupE";
-    licensesTask.addLicensesFromPom(deps2, group2, name2);
+    String version2 = "1";
+    licensesTask.addLicensesFromPom(deps2, group2, name2, version2);
 
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected =
@@ -180,12 +188,14 @@ public class LicensesTaskTest {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
-    licensesTask.addLicensesFromPom(deps1, group1, name1);
+    String version1 = "1";
+    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
 
     File deps2 = getResourceFile("dependencies/groupA/deps1.pom");
     String name2 = "deps1";
     String group2 = "groupA";
-    licensesTask.addLicensesFromPom(deps2, group2, name2);
+    String version2 = "1";
+    licensesTask.addLicensesFromPom(deps2, group2, name2, version2);
 
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected = "http://www.opensource.org/licenses/mit-license.php" + LINE_BREAK;
@@ -289,7 +299,7 @@ public class LicensesTaskTest {
   @Test
   public void testAppendLicense() throws IOException {
     licensesTask.appendDependency(
-        new LicensesTask.Dependency("license1", "license1"),
+        new LicensesTask.Dependency("license1", "license1", "", "", "", ""),
         "test".getBytes(UTF_8));
 
     String expected = "test" + LINE_BREAK;
@@ -300,8 +310,8 @@ public class LicensesTaskTest {
 
   @Test
   public void testWriteMetadata() throws IOException {
-    LicensesTask.Dependency dep1 = new LicensesTask.Dependency("test:foo", "Dependency 1");
-    LicensesTask.Dependency dep2 = new LicensesTask.Dependency("test:bar", "Dependency 2");
+    LicensesTask.Dependency dep1 = new LicensesTask.Dependency("test:foo", "Dependency 1", "", "", "", "");
+    LicensesTask.Dependency dep2 = new LicensesTask.Dependency("test:bar", "Dependency 2", "", "", "", "");
     licensesTask.licensesMap.put(dep1.getKey(), dep1.buildLicensesMetadata("0:4"));
     licensesTask.licensesMap.put(dep2.getKey(), dep2.buildLicensesMetadata("6:10"));
     licensesTask.writeMetadata();
@@ -317,12 +327,14 @@ public class LicensesTaskTest {
     File deps6 = getResourceFile("dependencies/groupF/deps6.pom");
     String name1 = "deps6";
     String group1 = "groupF";
-    licensesTask.addLicensesFromPom(deps6, group1, name1);
+    String version1 = "1";
+    licensesTask.addLicensesFromPom(deps6, group1, name1, version1);
 
     File deps7 = getResourceFile("dependencies/groupF/deps7.pom");
     String name2 = "deps7";
     String group2 = "groupF";
-    licensesTask.addLicensesFromPom(deps7, group2, name2);
+    String version2 = "1";
+    licensesTask.addLicensesFromPom(deps7, group2, name2, version2);
 
     assertThat(licensesTask.licensesMap.size(), is(2));
     assertTrue(licensesTask.licensesMap.containsKey("groupF:deps6"));

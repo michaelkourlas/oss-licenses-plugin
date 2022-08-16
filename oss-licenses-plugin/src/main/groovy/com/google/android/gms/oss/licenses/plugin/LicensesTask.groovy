@@ -17,6 +17,8 @@
 package com.google.android.gms.oss.licenses.plugin
 
 import groovy.json.JsonSlurper
+import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVPrinter
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
@@ -50,6 +52,7 @@ abstract class LicensesTask extends DefaultTask {
     protected int start = 0
     protected Set<String> googleServiceLicenses = []
     protected Map<String, String> licensesMap = [:]
+    protected Map<String, String> licensesCsvMap = [:]
     protected Map<String, String> licenseOffsets = [:]
     protected static final String ABSENT_DEPENDENCY_KEY = "Debug License Info"
     protected static final String ABSENT_DEPENDENCY_TEXT = ("Licenses are " +
@@ -69,11 +72,15 @@ abstract class LicensesTask extends DefaultTask {
     @OutputFile
     File licensesMetadata
 
+    @OutputFile
+    File licensesMetadataCsv
+
     @TaskAction
     void action() {
         initOutputDir()
         initLicenseFile()
         initLicensesMetadata()
+        initLicensesMetadataCsv()
 
         File dependenciesJsonFile = dependenciesJson.asFile.get()
         def artifactInfoSet = loadDependenciesJson(dependenciesJsonFile)
@@ -105,6 +112,7 @@ abstract class LicensesTask extends DefaultTask {
         }
 
         writeMetadata()
+        writeMetadataCsv()
     }
 
     private static Set<ArtifactInfo> loadDependenciesJson(File jsonFile) {
@@ -141,6 +149,12 @@ abstract class LicensesTask extends DefaultTask {
 
     protected void initLicensesMetadata() {
         licensesMetadata.newWriter().withWriter { w ->
+            w << ''
+        }
+    }
+
+    protected void initLicensesMetadataCsv() {
+        licensesMetadataCsv.newWriter().withWriter { w ->
             w << ''
         }
     }
@@ -233,10 +247,10 @@ abstract class LicensesTask extends DefaultTask {
 
     protected void addLicensesFromPom(ArtifactInfo artifactInfo) {
         def pomFile = DependencyUtil.resolvePomFileArtifact(getProject(), artifactInfo)
-        addLicensesFromPom((File) pomFile, artifactInfo.group, artifactInfo.name)
+        addLicensesFromPom((File) pomFile, artifactInfo.group, artifactInfo.name, artifactInfo.version)
     }
 
-    protected void addLicensesFromPom(File pomFile, String group, String name) {
+    protected void addLicensesFromPom(File pomFile, String group, String name, String version) {
         if (pomFile == null || !pomFile.exists()) {
             logger.error("POM file $pomFile for $group:$name does not exist.")
             return
@@ -257,17 +271,17 @@ abstract class LicensesTask extends DefaultTask {
                 String licenseName = license.name
                 String licenseUrl = license.url
                 appendDependency(
-                        new Dependency("${licenseKey} ${licenseName}", libraryName),
+                        new Dependency("${licenseKey} ${licenseName}", libraryName, group, name, version, licenseName),
                         licenseUrl.getBytes(UTF_8))
             }
         } else {
             String nodeUrl = rootNode.licenses.license.url
-            appendDependency(new Dependency(licenseKey, libraryName), nodeUrl.getBytes(UTF_8))
+            appendDependency(new Dependency(licenseKey, libraryName, group, name, version, licenseName), nodeUrl.getBytes(UTF_8))
         }
     }
 
     protected void appendDependency(String key, byte[] license) {
-        appendDependency(new Dependency(key, key), license)
+        appendDependency(new Dependency(key, key, "", "", "", ""), license)
     }
 
     protected void appendDependency(Dependency dependency, byte[] license) {
@@ -286,6 +300,7 @@ abstract class LicensesTask extends DefaultTask {
             appendLicenseContent(LINE_SEPARATOR)
         }
         licensesMap.put(dependency.key, dependency.buildLicensesMetadata(offsets))
+        licensesCsvMap.put(dependency.key, dependency.buildLicensesMetadataCsv(offsets))
     }
 
     protected void appendLicenseContent(byte[] content) {
@@ -300,6 +315,13 @@ abstract class LicensesTask extends DefaultTask {
         }
     }
 
+    protected void writeMetadataCsv() {
+        for (entry in licensesCsvMap) {
+            licensesMetadataCsv.append(entry.value, UTF_8)
+            licensesMetadataCsv.append(LINE_SEPARATOR)
+        }
+    }
+
     static ArtifactInfo artifactInfoFromEntry(Object entry) {
         return new ArtifactInfo(entry.group, entry.name, entry.version)
     }
@@ -307,14 +329,36 @@ abstract class LicensesTask extends DefaultTask {
     protected static class Dependency {
         String key
         String name
+        String groupId
+        String artifactId
+        String version
+        String licenseName
 
-        Dependency(String key, String name) {
+        Dependency(String key, String name, String groupId, String artifactId, String version, String licenseName) {
             this.key = key
             this.name = name
+            this.groupId = groupId
+            this.artifactId = artifactId
+            this.version = version
+            this.licenseName = licenseName
         }
 
         String buildLicensesMetadata(String offset) {
             return "$offset $name"
+        }
+
+        String buildLicensesMetadataCsv(String offset) {
+            StringBuilder line = new StringBuilder()
+            CSVPrinter csv = new CSVPrinter(line, CSVFormat.DEFAULT)
+            csv.print(offset)
+            csv.print(name)
+            csv.print(groupId)
+            csv.print(artifactId)
+            csv.print(version)
+            csv.print(licenseName)
+            csv.println()
+            csv.close()
+            return line.toString()
         }
     }
 }

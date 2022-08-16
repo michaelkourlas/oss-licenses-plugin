@@ -33,6 +33,8 @@ class LicensesCleanUpTask extends DefaultTask {
 
     protected File metadataFile
 
+    protected File metadataCsvFile
+
     protected File licensesDir
 
     @TaskAction
@@ -51,6 +53,10 @@ class LicensesCleanUpTask extends DefaultTask {
 
         if (metadataFile.exists()) {
             metadataFile.delete()
+        }
+
+        if (metadataCsvFile.exists()) {
+            metadataCsvFile.delete()
         }
 
         if (licensesDir.isDirectory() && licensesDir.list().length == 0) {

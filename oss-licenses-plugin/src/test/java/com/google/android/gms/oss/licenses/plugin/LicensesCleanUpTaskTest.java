@@ -47,6 +47,7 @@ public class LicensesCleanUpTaskTest {
 
     File licensesFile = new File(licensesDir, "third_party_licenses");
     File metadataFile = new File(licensesDir, "third_party_license_metadata");
+    File metadataCsvFile = new File(licensesDir, "third_party_license_metadata_csv");
 
     Project project = ProjectBuilder.builder().withProjectDir(testDir).build();
     LicensesCleanUpTask task =
@@ -56,6 +57,7 @@ public class LicensesCleanUpTaskTest {
     task.licensesDir = licensesDir;
     task.licensesFile = licensesFile;
     task.metadataFile = metadataFile;
+    task.metadataCsvFile = metadataCsvFile;
 
     task.action();
     assertFalse(task.dependenciesJson.exists());

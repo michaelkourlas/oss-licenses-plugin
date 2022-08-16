@@ -47,6 +47,8 @@ class OssLicensesPlugin implements Plugin<Project> {
                 def licensesFile = new File(rawResourceDir, "third_party_licenses")
                 def licensesMetadataFile = new File(rawResourceDir,
                         "third_party_license_metadata")
+                def licensesMetadataCsvFile = new File(rawResourceDir,
+                        "third_party_license_metadata_csv")
 
                 def licenseTask = project.tasks.register(
                         "${variant.name}OssLicensesTask",
@@ -55,6 +57,7 @@ class OssLicensesPlugin implements Plugin<Project> {
                     it.rawResourceDir = rawResourceDir
                     it.licenses = licensesFile
                     it.licensesMetadata = licensesMetadataFile
+                    it.licensesMetadataCsv = licensesMetadataCsvFile
                 }.get()
                 logger.debug("Created task ${licenseTask.name}")
 
@@ -67,6 +70,7 @@ class OssLicensesPlugin implements Plugin<Project> {
                     it.dependencyDir = baseDir
                     it.licensesFile = licensesFile
                     it.metadataFile = licensesMetadataFile
+                    it.metadataCsvFile = licensesMetadataCsvFile
                     it.licensesDir = rawResourceDir
                 }.get()
                 logger.debug("Created task ${cleanupTask.name}")
