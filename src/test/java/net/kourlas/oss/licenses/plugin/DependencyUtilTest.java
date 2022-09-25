@@ -1,4 +1,4 @@
-package com.google.android.gms.oss.licenses.plugin;
+package net.kourlas.oss.licenses.plugin;
 
 
 import static com.google.common.truth.Truth.assertThat;

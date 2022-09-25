@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.gms.oss.licenses.plugin
+package net.kourlas.oss.licenses.plugin
 
 import com.android.tools.build.libraries.metadata.AppDependencies
 import groovy.json.JsonBuilder

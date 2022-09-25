@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.google.android.gms.oss.licenses.plugin;
+package net.kourlas.oss.licenses.plugin;
 
 import static org.junit.Assert.assertEquals;
 

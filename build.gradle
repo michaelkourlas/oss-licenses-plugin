@@ -18,8 +18,8 @@ dependencies {
     testImplementation 'com.google.code.gson:gson:2.8.9'
 }
 
-group = 'com.google.android.gms'
-version = '0.10.5'
+group = 'net.kourlas'
+version = '0.0.1'
 
 repositories {
     google()

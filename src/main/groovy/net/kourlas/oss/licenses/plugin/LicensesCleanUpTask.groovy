@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.gms.oss.licenses.plugin
+package net.kourlas.oss.licenses.plugin
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction

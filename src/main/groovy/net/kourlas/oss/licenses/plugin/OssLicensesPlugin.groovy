@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.gms.oss.licenses.plugin
+package net.kourlas.oss.licenses.plugin
 
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.gradle.api.BaseVariant

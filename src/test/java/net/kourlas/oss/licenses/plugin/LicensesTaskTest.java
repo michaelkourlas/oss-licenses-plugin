@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.google.android.gms.oss.licenses.plugin;
+package net.kourlas.oss.licenses.plugin;
 
 import static org.gradle.internal.impldep.org.testng.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,9 +25,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.android.tools.r8.graph.S;
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonWriter;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -36,7 +35,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -44,7 +42,6 @@ import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.gradle.api.Project;
-import org.gradle.internal.impldep.com.fasterxml.jackson.core.json.JsonWriteContext;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Before;
 import org.junit.Rule;
