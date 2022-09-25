@@ -16,9 +16,8 @@
 
 package net.kourlas.oss.licenses.plugin
 
+import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVPrinter
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
@@ -49,10 +48,11 @@ abstract class LicensesTask extends DefaultTask {
 
     private static final logger = LoggerFactory.getLogger(LicensesTask.class)
 
+    protected Set<ExtendedArtifactInfo> extendedArtifactInfoSet = []
+
     protected int start = 0
     protected Set<String> googleServiceLicenses = []
     protected Map<String, String> licensesMap = [:]
-    protected Map<String, String> licensesCsvMap = [:]
     protected Map<String, String> licenseOffsets = [:]
     protected static final String ABSENT_DEPENDENCY_KEY = "Debug License Info"
     protected static final String ABSENT_DEPENDENCY_TEXT = ("Licenses are " +
@@ -63,6 +63,9 @@ abstract class LicensesTask extends DefaultTask {
     @InputFile
     abstract RegularFileProperty getDependenciesJson()
 
+    @OutputFile
+    File extendedDependenciesJson
+
     @OutputDirectory
     File rawResourceDir
 
@@ -72,15 +75,12 @@ abstract class LicensesTask extends DefaultTask {
     @OutputFile
     File licensesMetadata
 
-    @OutputFile
-    File licensesMetadataCsv
-
     @TaskAction
     void action() {
         initOutputDir()
         initLicenseFile()
         initLicensesMetadata()
-        initLicensesMetadataCsv()
+        initExtendedDependenciesJson()
 
         File dependenciesJsonFile = dependenciesJson.asFile.get()
         def artifactInfoSet = loadDependenciesJson(dependenciesJsonFile)
@@ -112,7 +112,7 @@ abstract class LicensesTask extends DefaultTask {
         }
 
         writeMetadata()
-        writeMetadataCsv()
+        writeExtendedDependenciesJson()
     }
 
     private static Set<ArtifactInfo> loadDependenciesJson(File jsonFile) {
@@ -153,8 +153,8 @@ abstract class LicensesTask extends DefaultTask {
         }
     }
 
-    protected void initLicensesMetadataCsv() {
-        licensesMetadataCsv.newWriter().withWriter { w ->
+    protected void initExtendedDependenciesJson() {
+        extendedDependenciesJson.newWriter().withWriter { w ->
             w << ''
         }
     }
@@ -301,7 +301,14 @@ abstract class LicensesTask extends DefaultTask {
             appendLicenseContent(LINE_SEPARATOR)
         }
         licensesMap.put(dependency.key, dependency.buildLicensesMetadata(offsets))
-        licensesCsvMap.put(dependency.key, dependency.buildLicensesMetadataCsv(offsets))
+
+        extendedArtifactInfoSet.add(
+                new ExtendedArtifactInfo(
+                        dependency.groupId,
+                        dependency.artifactId,
+                        dependency.version,
+                        dependency.name,
+                        dependency.licenseName))
     }
 
     protected void appendLicenseContent(byte[] content) {
@@ -316,10 +323,9 @@ abstract class LicensesTask extends DefaultTask {
         }
     }
 
-    protected void writeMetadataCsv() {
-        for (entry in licensesCsvMap) {
-            licensesMetadataCsv.append(entry.value, UTF_8)
-            licensesMetadataCsv.append(LINE_SEPARATOR)
+    protected void writeExtendedDependenciesJson() {
+        extendedDependenciesJson.newWriter().withWriter {
+            it.write(new JsonBuilder(extendedArtifactInfoSet).toPrettyString())
         }
     }
 
@@ -346,20 +352,6 @@ abstract class LicensesTask extends DefaultTask {
 
         String buildLicensesMetadata(String offset) {
             return "$offset $name"
-        }
-
-        String buildLicensesMetadataCsv(String offset) {
-            StringBuilder line = new StringBuilder()
-            CSVPrinter csv = new CSVPrinter(line, CSVFormat.DEFAULT)
-            csv.print(offset)
-            csv.print(name)
-            csv.print(groupId)
-            csv.print(artifactId)
-            csv.print(version)
-            csv.print(licenseName)
-            csv.println()
-            csv.close()
-            return line.toString()
         }
     }
 }

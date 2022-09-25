@@ -75,7 +75,7 @@ public class LicensesTaskTest {
     licensesTask.setRawResourceDir(outputDir);
     licensesTask.setLicenses(outputLicenses);
     licensesTask.setLicensesMetadata(outputMetadata);
-    licensesTask.setLicensesMetadataCsv(outputMetadataCsv);
+    licensesTask.setExtendedDependenciesJson(outputMetadataCsv);
   }
 
   @Test

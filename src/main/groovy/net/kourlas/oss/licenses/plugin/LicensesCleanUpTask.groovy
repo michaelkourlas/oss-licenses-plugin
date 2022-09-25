@@ -27,13 +27,13 @@ class LicensesCleanUpTask extends DefaultTask {
 
     protected File dependenciesJson
 
+    protected File extendedDependenciesJson
+
     protected File dependencyDir
 
     protected File licensesFile
 
     protected File metadataFile
-
-    protected File metadataCsvFile
 
     protected File licensesDir
 
@@ -41,6 +41,10 @@ class LicensesCleanUpTask extends DefaultTask {
     void action() {
         if (dependenciesJson.exists()) {
             dependenciesJson.delete()
+        }
+
+        if (extendedDependenciesJson.exists()) {
+            extendedDependenciesJson.delete()
         }
 
         if (dependencyDir.isDirectory() && dependencyDir.list().length == 0) {
@@ -53,10 +57,6 @@ class LicensesCleanUpTask extends DefaultTask {
 
         if (metadataFile.exists()) {
             metadataFile.delete()
-        }
-
-        if (metadataCsvFile.exists()) {
-            metadataCsvFile.delete()
         }
 
         if (licensesDir.isDirectory() && licensesDir.list().length == 0) {
