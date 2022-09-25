@@ -275,8 +275,9 @@ abstract class LicensesTask extends DefaultTask {
                         licenseUrl.getBytes(UTF_8))
             }
         } else {
+            String nodeName = rootNode.licenses.license.name
             String nodeUrl = rootNode.licenses.license.url
-            appendDependency(new Dependency(licenseKey, libraryName, group, name, version, licenseName), nodeUrl.getBytes(UTF_8))
+            appendDependency(new Dependency(licenseKey, libraryName, group, name, version, nodeName), nodeUrl.getBytes(UTF_8))
         }
     }
 

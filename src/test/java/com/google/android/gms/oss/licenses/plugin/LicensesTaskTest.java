@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.android.tools.r8.graph.S;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import java.io.BufferedReader;
@@ -35,6 +36,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -114,7 +117,7 @@ public class LicensesTaskTest {
   }
 
   @Test
-  public void testAddLicensesFromPom() throws IOException {
+  public void testAddLicensesFromPom() throws IOException, URISyntaxException {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
@@ -129,7 +132,7 @@ public class LicensesTaskTest {
   }
 
   @Test
-  public void testAddLicensesFromPom_withoutDuplicate() throws IOException {
+  public void testAddLicensesFromPom_withoutDuplicate() throws IOException, URISyntaxException {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
@@ -156,7 +159,7 @@ public class LicensesTaskTest {
   }
 
   @Test
-  public void testAddLicensesFromPom_withMultiple() throws IOException {
+  public void testAddLicensesFromPom_withMultiple() throws IOException, URISyntaxException {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
@@ -184,7 +187,7 @@ public class LicensesTaskTest {
   }
 
   @Test
-  public void testAddLicensesFromPom_withDuplicate() throws IOException {
+  public void testAddLicensesFromPom_withDuplicate() throws IOException, URISyntaxException {
     File deps1 = getResourceFile("dependencies/groupA/deps1.pom");
     String name1 = "deps1";
     String group1 = "groupA";
@@ -205,8 +208,8 @@ public class LicensesTaskTest {
     assertEquals(expected, content);
   }
 
-  private File getResourceFile(String resourcePath) {
-    return new File(getClass().getClassLoader().getResource(resourcePath).getFile());
+  private File getResourceFile(String resourcePath) throws URISyntaxException {
+    return new File(getClass().getClassLoader().getResource(resourcePath).toURI().getPath());
   }
 
   @Test
@@ -231,10 +234,10 @@ public class LicensesTaskTest {
 
   @Test
   public void testGetBytesFromInputStream_specialCharacters() {
-    String test = "Copyright © 1991-2017 Unicode";
+    String test = "Copyright \u00A9 1991-2017 Unicode";
     InputStream inputStream = new ByteArrayInputStream(test.getBytes(UTF_8));
     String content = new String(LicensesTask.getBytesFromInputStream(inputStream, 4, 18), UTF_8);
-    assertEquals("right © 1991-2017", content);
+    assertEquals("right \u00A9 1991-2017", content);
   }
 
   @Test
@@ -323,7 +326,7 @@ public class LicensesTaskTest {
   }
 
   @Test
-  public void testDependenciesWithNameDuplicatedNames() throws IOException {
+  public void testDependenciesWithNameDuplicatedNames() throws IOException, URISyntaxException {
     File deps6 = getResourceFile("dependencies/groupF/deps6.pom");
     String name1 = "deps6";
     String group1 = "groupF";
