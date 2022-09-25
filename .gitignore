@@ -1,2 +1,8 @@
-.idea/
-repo/
+.idea/*
+!.idea/codeStyles
+
+build/
+out/
+*.iml
+.gradle
+local.properties
