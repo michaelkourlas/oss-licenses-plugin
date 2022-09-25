@@ -1,8 +1,4 @@
-.idea/*
-!.idea/codeStyles
-
-build/
-out/
-*.iml
 .gradle
+.vscode
+build/
 local.properties
