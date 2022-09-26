@@ -3,16 +3,13 @@ package net.kourlas.oss.licenses.plugin
 class ExtendedArtifactInfo {
     private String name
     private ArtifactInfo artifactInfo
-    private boolean pom
-    private Set<String> licenses
+    private Set<LicenseInfo> licenses
 
     ExtendedArtifactInfo(String name,
                          ArtifactInfo artifactInfo,
-                         boolean pom,
-                         Set<String> licenses) {
+                         Set<LicenseInfo> licenses) {
         this.name = name
         this.artifactInfo = artifactInfo
-        this.pom = pom
         this.licenses = licenses
     }
 
@@ -24,11 +21,7 @@ class ExtendedArtifactInfo {
         return artifactInfo
     }
 
-    boolean isPom() {
-        return pom
-    }
-
-    Set<String> getLicenses() {
+    Set<LicenseInfo> getLicenses() {
         return licenses
     }
 
@@ -38,7 +31,6 @@ class ExtendedArtifactInfo {
 
         ExtendedArtifactInfo that = (ExtendedArtifactInfo) o
 
-        if (pom != that.pom) return false
         if (artifactInfo != that.artifactInfo) return false
         if (licenses != that.licenses) return false
         if (name != that.name) return false
@@ -50,7 +42,6 @@ class ExtendedArtifactInfo {
         int result
         result = name.hashCode()
         result = 31 * result + (artifactInfo != null ? artifactInfo.hashCode() : 0)
-        result = 31 * result + (pom ? 1 : 0)
         result = 31 * result + licenses.hashCode()
         return result
     }

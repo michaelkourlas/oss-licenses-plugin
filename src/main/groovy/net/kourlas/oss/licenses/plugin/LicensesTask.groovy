@@ -214,8 +214,7 @@ abstract class LicensesTask extends DefaultTask {
                         new ExtendedArtifactInfo(
                             key,
                             null,
-                            false,
-                            [new String(content, UTF_8)].toSet()))
+                            [new LicenseInfo(null, null, new String(content, UTF_8))].toSet()))
                 }
             }
         }
@@ -273,21 +272,20 @@ abstract class LicensesTask extends DefaultTask {
             libraryName = licenseKey
         }
         if (rootNode.licenses.license.size() > 1) {
-            Set<String> licenseNames = []
+            Set<LicenseInfo> licenses = []
             rootNode.licenses.license.each { license ->
                 String licenseName = license.name
                 String licenseUrl = license.url
                 appendDependency(
                     new Dependency("${licenseKey} ${licenseName}", libraryName),
                     licenseUrl.getBytes(UTF_8))
-                licenseNames.add(licenseName)
+                licenses.add(new LicenseInfo(licenseName, licenseUrl, null))
             }
             extendedArtifactInfoSet.add(
                 new ExtendedArtifactInfo(
                     libraryName,
                     artifactInfo,
-                    true,
-                    licenseNames))
+                    licenses))
         } else {
             String licenseName = rootNode.licenses.license.name
             String licenseUrl = rootNode.licenses.license.url
@@ -298,8 +296,7 @@ abstract class LicensesTask extends DefaultTask {
                 new ExtendedArtifactInfo(
                     libraryName,
                     artifactInfo,
-                    true,
-                    [licenseName].toSet()))
+                    [new LicenseInfo(licenseName, licenseUrl, null)].toSet()))
         }
     }
 
@@ -309,8 +306,7 @@ abstract class LicensesTask extends DefaultTask {
             new ExtendedArtifactInfo(
                 key,
                 null,
-                false,
-                [new String(license, UTF_8)].toSet()))
+                [new LicenseInfo(null, null, new String(license, UTF_8))].toSet()))
     }
 
     protected void appendDependency(Dependency dependency, byte[] license) {
