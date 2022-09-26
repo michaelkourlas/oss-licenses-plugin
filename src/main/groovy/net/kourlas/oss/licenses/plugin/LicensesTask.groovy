@@ -210,6 +210,12 @@ abstract class LicensesTask extends DefaultTask {
                             lengthValue)
                     googleServiceLicenses.add(key)
                     appendDependency(key, content)
+                    extendedArtifactInfoSet.add(
+                        new ExtendedArtifactInfo(
+                            key,
+                            null,
+                            false,
+                            [new String(content, UTF_8)].toSet()))
                 }
             }
         }
@@ -247,10 +253,10 @@ abstract class LicensesTask extends DefaultTask {
 
     protected void addLicensesFromPom(ArtifactInfo artifactInfo) {
         def pomFile = DependencyUtil.resolvePomFileArtifact(getProject(), artifactInfo)
-        addLicensesFromPom((File) pomFile, artifactInfo.group, artifactInfo.name, artifactInfo.version)
+        addLicensesFromPom((File) pomFile, artifactInfo)
     }
 
-    protected void addLicensesFromPom(File pomFile, String group, String name, String version) {
+    protected void addLicensesFromPom(File pomFile, ArtifactInfo artifactInfo) {
         if (pomFile == null || !pomFile.exists()) {
             logger.error("POM file $pomFile for $group:$name does not exist.")
             return
@@ -262,27 +268,49 @@ abstract class LicensesTask extends DefaultTask {
         }
 
         String libraryName = rootNode.name
-        String licenseKey = "${group}:${name}"
+        String licenseKey = "${artifactInfo.group}:${artifactInfo.name}"
         if (libraryName == null || libraryName.isBlank()) {
             libraryName = licenseKey
         }
         if (rootNode.licenses.license.size() > 1) {
+            Set<String> licenseNames = []
             rootNode.licenses.license.each { license ->
                 String licenseName = license.name
                 String licenseUrl = license.url
                 appendDependency(
-                        new Dependency("${licenseKey} ${licenseName}", libraryName, group, name, version, licenseName),
-                        licenseUrl.getBytes(UTF_8))
+                    new Dependency("${licenseKey} ${licenseName}", libraryName),
+                    licenseUrl.getBytes(UTF_8))
+                licenseNames.add(licenseName)
             }
+            extendedArtifactInfoSet.add(
+                new ExtendedArtifactInfo(
+                    libraryName,
+                    artifactInfo,
+                    true,
+                    licenseNames))
         } else {
-            String nodeName = rootNode.licenses.license.name
-            String nodeUrl = rootNode.licenses.license.url
-            appendDependency(new Dependency(licenseKey, libraryName, group, name, version, nodeName), nodeUrl.getBytes(UTF_8))
+            String licenseName = rootNode.licenses.license.name
+            String licenseUrl = rootNode.licenses.license.url
+            appendDependency(
+                new Dependency(licenseKey, libraryName),
+                licenseUrl.getBytes(UTF_8))
+            extendedArtifactInfoSet.add(
+                new ExtendedArtifactInfo(
+                    libraryName,
+                    artifactInfo,
+                    true,
+                    [licenseName].toSet()))
         }
     }
 
     protected void appendDependency(String key, byte[] license) {
-        appendDependency(new Dependency(key, key, "", "", "", ""), license)
+        appendDependency(new Dependency(key, key), license)
+        extendedArtifactInfoSet.add(
+            new ExtendedArtifactInfo(
+                key,
+                null,
+                false,
+                [new String(license, UTF_8)].toSet()))
     }
 
     protected void appendDependency(Dependency dependency, byte[] license) {
@@ -301,14 +329,6 @@ abstract class LicensesTask extends DefaultTask {
             appendLicenseContent(LINE_SEPARATOR)
         }
         licensesMap.put(dependency.key, dependency.buildLicensesMetadata(offsets))
-
-        extendedArtifactInfoSet.add(
-                new ExtendedArtifactInfo(
-                        dependency.groupId,
-                        dependency.artifactId,
-                        dependency.version,
-                        dependency.name,
-                        dependency.licenseName))
     }
 
     protected void appendLicenseContent(byte[] content) {
@@ -336,18 +356,10 @@ abstract class LicensesTask extends DefaultTask {
     protected static class Dependency {
         String key
         String name
-        String groupId
-        String artifactId
-        String version
-        String licenseName
 
-        Dependency(String key, String name, String groupId, String artifactId, String version, String licenseName) {
+        Dependency(String key, String name) {
             this.key = key
             this.name = name
-            this.groupId = groupId
-            this.artifactId = artifactId
-            this.version = version
-            this.licenseName = licenseName
         }
 
         String buildLicensesMetadata(String offset) {

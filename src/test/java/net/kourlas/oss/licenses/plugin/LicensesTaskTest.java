@@ -119,7 +119,7 @@ public class LicensesTaskTest {
     String name1 = "deps1";
     String group1 = "groupA";
     String version1 = "1";
-    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
+    licensesTask.addLicensesFromPom(deps1, new ArtifactInfo(group1, name1, version1));
 
     assertTrue(licensesTask.getLicenses().exists());
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
@@ -134,13 +134,13 @@ public class LicensesTaskTest {
     String name1 = "deps1";
     String group1 = "groupA";
     String version1 = "1";
-    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
+    licensesTask.addLicensesFromPom(deps1, new ArtifactInfo(group1, name1, version1));
 
     File deps2 = getResourceFile("dependencies/groupB/bcd/deps2.pom");
     String name2 = "deps2";
     String group2 = "groupB";
     String version2 = "1";
-    licensesTask.addLicensesFromPom(deps2, group2, name2, version2);
+    licensesTask.addLicensesFromPom(deps2, new ArtifactInfo(group2, name2, version2));
 
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected =
@@ -161,13 +161,13 @@ public class LicensesTaskTest {
     String name1 = "deps1";
     String group1 = "groupA";
     String version1 = "1";
-    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
+    licensesTask.addLicensesFromPom(deps1, new ArtifactInfo(group1, name1, version1));
 
     File deps2 = getResourceFile("dependencies/groupE/deps5.pom");
     String name2 = "deps5";
     String group2 = "groupE";
     String version2 = "1";
-    licensesTask.addLicensesFromPom(deps2, group2, name2, version2);
+    licensesTask.addLicensesFromPom(deps2, new ArtifactInfo(group2, name2, version2));
 
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected =
@@ -189,13 +189,13 @@ public class LicensesTaskTest {
     String name1 = "deps1";
     String group1 = "groupA";
     String version1 = "1";
-    licensesTask.addLicensesFromPom(deps1, group1, name1, version1);
+    licensesTask.addLicensesFromPom(deps1, new ArtifactInfo(group1, name1, version1));
 
     File deps2 = getResourceFile("dependencies/groupA/deps1.pom");
     String name2 = "deps1";
     String group2 = "groupA";
     String version2 = "1";
-    licensesTask.addLicensesFromPom(deps2, group2, name2, version2);
+    licensesTask.addLicensesFromPom(deps2, new ArtifactInfo(group2, name2, version2));
 
     String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
     String expected = "http://www.opensource.org/licenses/mit-license.php" + LINE_BREAK;
@@ -299,7 +299,7 @@ public class LicensesTaskTest {
   @Test
   public void testAppendLicense() throws IOException {
     licensesTask.appendDependency(
-        new LicensesTask.Dependency("license1", "license1", "", "", "", ""),
+        new LicensesTask.Dependency("license1", "license1"),
         "test".getBytes(UTF_8));
 
     String expected = "test" + LINE_BREAK;
@@ -310,8 +310,8 @@ public class LicensesTaskTest {
 
   @Test
   public void testWriteMetadata() throws IOException {
-    LicensesTask.Dependency dep1 = new LicensesTask.Dependency("test:foo", "Dependency 1", "", "", "", "");
-    LicensesTask.Dependency dep2 = new LicensesTask.Dependency("test:bar", "Dependency 2", "", "", "", "");
+    LicensesTask.Dependency dep1 = new LicensesTask.Dependency("test:foo", "Dependency 1");
+    LicensesTask.Dependency dep2 = new LicensesTask.Dependency("test:bar", "Dependency 2");
     licensesTask.licensesMap.put(dep1.getKey(), dep1.buildLicensesMetadata("0:4"));
     licensesTask.licensesMap.put(dep2.getKey(), dep2.buildLicensesMetadata("6:10"));
     licensesTask.writeMetadata();
@@ -328,13 +328,13 @@ public class LicensesTaskTest {
     String name1 = "deps6";
     String group1 = "groupF";
     String version1 = "1";
-    licensesTask.addLicensesFromPom(deps6, group1, name1, version1);
+    licensesTask.addLicensesFromPom(deps6, new ArtifactInfo(group1, name1, version1));
 
     File deps7 = getResourceFile("dependencies/groupF/deps7.pom");
     String name2 = "deps7";
     String group2 = "groupF";
     String version2 = "1";
-    licensesTask.addLicensesFromPom(deps7, group2, name2, version2);
+    licensesTask.addLicensesFromPom(deps7, new ArtifactInfo(group2, name2, version2));
 
     assertThat(licensesTask.licensesMap.size(), is(2));
     assertTrue(licensesTask.licensesMap.containsKey("groupF:deps6"));

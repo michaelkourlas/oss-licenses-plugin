@@ -1,44 +1,57 @@
 package net.kourlas.oss.licenses.plugin
 
-class ExtendedArtifactInfo extends ArtifactInfo {
-    private String prettyName
-    private String licenseName
+class ExtendedArtifactInfo {
+    private String name
+    private ArtifactInfo artifactInfo
+    private boolean pom
+    private Set<String> licenses
 
-    ExtendedArtifactInfo(String group,
-                         String name,
-                         String version,
-                         String prettyName,
-                         String licenseName) {
-        super(group, name, version)
-
-        this.prettyName = prettyName
-        this.licenseName = licenseName
+    ExtendedArtifactInfo(String name,
+                         ArtifactInfo artifactInfo,
+                         boolean pom,
+                         Set<String> licenses) {
+        this.name = name
+        this.artifactInfo = artifactInfo
+        this.pom = pom
+        this.licenses = licenses
     }
 
-    String getPrettyName() {
-        return prettyName
+    String getName() {
+        return name
     }
 
-    String getLicenseName() {
-        return licenseName
+    ArtifactInfo getArtifactInfo() {
+        return artifactInfo
     }
 
-    @Override
-    boolean equals(Object obj) {
-        if (!super.equals(obj)) {
-            return false
-        }
-        if (obj instanceof ExtendedArtifactInfo) {
-            return (prettyName == obj.prettyName
-                    && licenseName == obj.licenseName)
-        }
-        return false
+    boolean isPom() {
+        return pom
     }
 
-    @Override
+    Set<String> getLicenses() {
+        return licenses
+    }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        ExtendedArtifactInfo that = (ExtendedArtifactInfo) o
+
+        if (pom != that.pom) return false
+        if (artifactInfo != that.artifactInfo) return false
+        if (licenses != that.licenses) return false
+        if (name != that.name) return false
+
+        return true
+    }
+
     int hashCode() {
-        return (super.hashCode()
-                ^ prettyName.hashCode()
-                ^ licenseName.hashCode())
+        int result
+        result = name.hashCode()
+        result = 31 * result + (artifactInfo != null ? artifactInfo.hashCode() : 0)
+        result = 31 * result + (pom ? 1 : 0)
+        result = 31 * result + licenses.hashCode()
+        return result
     }
 }
