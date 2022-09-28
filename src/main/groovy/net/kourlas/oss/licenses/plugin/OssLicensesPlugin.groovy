@@ -63,23 +63,11 @@ class OssLicensesPlugin implements Plugin<Project> {
                     it.dependenciesJson = dependenciesJson
                     it.extendedDependenciesJson = extendedDependenciesJson
                     it.dependencyDir = baseDir
-                    it.licensesDir = rawResourceDir
                 }.get()
                 logger.debug("Created task ${cleanupTask.name}")
 
                 project.tasks.findByName("clean").dependsOn(cleanupTask)
             })
-        }
-
-        // TODO: Switch to new Variant API when API is ready and before
-        //  BaseVariant is removed in 8.0
-        project.android.applicationVariants.all { BaseVariant variant ->
-            def licenseTask = variantTolicenseTaskMap[variant.name]
-            if (licenseTask == null) {
-                return
-            }
-            def generatedResFolder = project.files(licenseTask.rawResourceDir.parentFile).builtBy(licenseTask)
-            variant.registerGeneratedResFolders(generatedResFolder)
         }
     }
 
