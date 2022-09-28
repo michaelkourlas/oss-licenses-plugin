@@ -32,7 +32,7 @@ class OssLicensesPlugin implements Plugin<Project> {
         project.androidComponents {
             onVariants(selector().all(), { variant ->
                 def baseDir = new File(project.buildDir,
-                        "generated/third_party_licenses/${variant.name}")
+                        "generated/oss_licenses/${variant.name}")
                 def dependenciesJson = new File(baseDir, "dependencies.json")
 
                 def dependencyTask = project.tasks.register(
