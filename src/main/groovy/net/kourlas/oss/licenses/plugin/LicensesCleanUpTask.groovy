@@ -31,12 +31,6 @@ class LicensesCleanUpTask extends DefaultTask {
 
     protected File dependencyDir
 
-    protected File licensesFile
-
-    protected File metadataFile
-
-    protected File licensesDir
-
     @TaskAction
     void action() {
         if (dependenciesJson.exists()) {
@@ -49,18 +43,6 @@ class LicensesCleanUpTask extends DefaultTask {
 
         if (dependencyDir.isDirectory() && dependencyDir.list().length == 0) {
             dependencyDir.delete()
-        }
-
-        if (licensesFile.exists()) {
-            licensesFile.delete()
-        }
-
-        if (metadataFile.exists()) {
-            metadataFile.delete()
-        }
-
-        if (licensesDir.isDirectory() && licensesDir.list().length == 0) {
-            licensesDir.delete()
         }
     }
 }

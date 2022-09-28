@@ -42,12 +42,6 @@ public class LicensesCleanUpTaskTest {
 
     File dependencyFile = new File(dependencyDir, "dependency.json");
 
-    File licensesDir = new File(testDir, "raw");
-    licensesDir.mkdir();
-
-    File licensesFile = new File(licensesDir, "third_party_licenses");
-    File metadataFile = new File(licensesDir, "third_party_license_metadata");
-
     File extendedDependenciesJson = new File(testDir, "dependencies-with-licenses.json");
 
     Project project = ProjectBuilder.builder().withProjectDir(testDir).build();
@@ -56,15 +50,9 @@ public class LicensesCleanUpTaskTest {
     task.dependencyDir = dependencyDir;
     task.dependenciesJson = dependencyFile;
     task.extendedDependenciesJson = extendedDependenciesJson;
-    task.licensesDir = licensesDir;
-    task.licensesFile = licensesFile;
-    task.metadataFile = metadataFile;
 
     task.action();
     assertFalse(task.dependenciesJson.exists());
     assertFalse(task.dependencyDir.exists());
-    assertFalse(task.licensesFile.exists());
-    assertFalse(task.metadataFile.exists());
-    assertFalse(task.licensesDir.exists());
   }
 }

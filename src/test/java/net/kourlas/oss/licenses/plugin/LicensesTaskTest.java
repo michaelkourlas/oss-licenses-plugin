@@ -65,40 +65,20 @@ public class LicensesTaskTest {
   @Before
   public void setUp() throws IOException {
     File outputDir = temporaryFolder.newFolder();
-    File outputLicenses = new File(outputDir, "testLicenses");
-    File outputMetadata = new File(outputDir, "testMetadata");
-    File outputMetadataCsv = new File(outputDir, "testMetadataCsv");
+    File outputExtendedDependencies = new File(outputDir, "testExtendedDependencies");
 
     project = ProjectBuilder.builder().withProjectDir(new File(BASE_DIR)).build();
     licensesTask = project.getTasks().create("generateLicenses", LicensesTask.class);
 
-    licensesTask.setRawResourceDir(outputDir);
-    licensesTask.setLicenses(outputLicenses);
-    licensesTask.setLicensesMetadata(outputMetadata);
-    licensesTask.setExtendedDependenciesJson(outputMetadataCsv);
+    licensesTask.setExtendedDependenciesJson(outputExtendedDependencies);
   }
 
   @Test
-  public void testInitOutputDir() {
-    licensesTask.initOutputDir();
+  public void testInitExtendedDependencies() throws IOException {
+    licensesTask.initExtendedDependenciesJson();
 
-    assertTrue(licensesTask.getRawResourceDir().exists());
-  }
-
-  @Test
-  public void testInitLicenseFile() throws IOException {
-    licensesTask.initLicenseFile();
-
-    assertTrue(licensesTask.getLicenses().exists());
-    assertEquals(0, Files.size(licensesTask.getLicenses().toPath()));
-  }
-
-  @Test
-  public void testInitLicensesMetadata() throws IOException {
-    licensesTask.initLicensesMetadata();
-
-    assertTrue(licensesTask.getLicensesMetadata().exists());
-    assertEquals(0, Files.size(licensesTask.getLicensesMetadata().toPath()));
+    assertTrue(licensesTask.getExtendedDependenciesJson().exists());
+    assertEquals(0, Files.size(licensesTask.getExtendedDependenciesJson().toPath()));
   }
 
   @Test
@@ -121,10 +101,9 @@ public class LicensesTaskTest {
     String version1 = "1";
     licensesTask.addLicensesFromPom(deps1, new ArtifactInfo(group1, name1, version1));
 
-    assertTrue(licensesTask.getLicenses().exists());
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    String expected = "http://www.opensource.org/licenses/mit-license.php" + LINE_BREAK;
-    assertTrue(licensesTask.licensesMap.containsKey("groupA:deps1"));
+    licensesTask.writeExtendedDependenciesJson();
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()), UTF_8);
+    String expected = "[{\"artifactInfo\":{\"group\":\"groupA\",\"version\":\"1\",\"name\":\"deps1\"},\"name\":\"groupA deps1\",\"licenses\":[{\"text\":null,\"url\":\"http://www.opensource.org/licenses/mit-license.php\",\"name\":\"MIT License\"}]}]";
     assertEquals(expected, content);
   }
 
@@ -142,16 +121,9 @@ public class LicensesTaskTest {
     String version2 = "1";
     licensesTask.addLicensesFromPom(deps2, new ArtifactInfo(group2, name2, version2));
 
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    String expected =
-        "http://www.opensource.org/licenses/mit-license.php"
-            + LINE_BREAK
-            + "https://www.apache.org/licenses/LICENSE-2.0"
-            + LINE_BREAK;
-
-    assertThat(licensesTask.licensesMap.size(), is(2));
-    assertTrue(licensesTask.licensesMap.containsKey("groupA:deps1"));
-    assertTrue(licensesTask.licensesMap.containsKey("groupB:deps2"));
+    licensesTask.writeExtendedDependenciesJson();
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()), UTF_8);
+    String expected = "[{\"artifactInfo\":{\"group\":\"groupA\",\"version\":\"1\",\"name\":\"deps1\"},\"name\":\"groupA deps1\",\"licenses\":[{\"text\":null,\"url\":\"http://www.opensource.org/licenses/mit-license.php\",\"name\":\"MIT License\"}]},{\"artifactInfo\":{\"group\":\"groupB\",\"version\":\"1\",\"name\":\"deps2\"},\"name\":\"groupB deps2\",\"licenses\":[{\"text\":null,\"url\":\"https://www.apache.org/licenses/LICENSE-2.0\",\"name\":\"Apache 2.0\"}]}]";
     assertEquals(expected, content);
   }
 
@@ -169,17 +141,9 @@ public class LicensesTaskTest {
     String version2 = "1";
     licensesTask.addLicensesFromPom(deps2, new ArtifactInfo(group2, name2, version2));
 
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    String expected =
-        "http://www.opensource.org/licenses/mit-license.php"
-            + LINE_BREAK
-            + "https://www.apache.org/licenses/LICENSE-2.0"
-            + LINE_BREAK;
-
-    assertThat(licensesTask.licensesMap.size(), is(3));
-    assertTrue(licensesTask.licensesMap.containsKey("groupA:deps1"));
-    assertTrue(licensesTask.licensesMap.containsKey("groupE:deps5 MIT License"));
-    assertTrue(licensesTask.licensesMap.containsKey("groupE:deps5 Apache License 2.0"));
+    licensesTask.writeExtendedDependenciesJson();
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()), UTF_8);
+    String expected = "[{\"artifactInfo\":{\"group\":\"groupA\",\"version\":\"1\",\"name\":\"deps1\"},\"name\":\"groupA deps1\",\"licenses\":[{\"text\":null,\"url\":\"http://www.opensource.org/licenses/mit-license.php\",\"name\":\"MIT License\"}]},{\"artifactInfo\":{\"group\":\"groupE\",\"version\":\"1\",\"name\":\"deps5\"},\"name\":\"groupE deps5\",\"licenses\":[{\"text\":null,\"url\":\"http://www.opensource.org/licenses/mit-license.php\",\"name\":\"MIT License\"},{\"text\":null,\"url\":\"https://www.apache.org/licenses/LICENSE-2.0\",\"name\":\"Apache License 2.0\"}]}]";
     assertEquals(expected, content);
   }
 
@@ -197,11 +161,9 @@ public class LicensesTaskTest {
     String version2 = "1";
     licensesTask.addLicensesFromPom(deps2, new ArtifactInfo(group2, name2, version2));
 
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    String expected = "http://www.opensource.org/licenses/mit-license.php" + LINE_BREAK;
-
-    assertThat(licensesTask.licensesMap.size(), is(1));
-    assertTrue(licensesTask.licensesMap.containsKey("groupA:deps1"));
+    licensesTask.writeExtendedDependenciesJson();
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()), UTF_8);
+    String expected = "[{\"artifactInfo\":{\"group\":\"groupA\",\"version\":\"1\",\"name\":\"deps1\"},\"name\":\"groupA deps1\",\"licenses\":[{\"text\":null,\"url\":\"http://www.opensource.org/licenses/mit-license.php\",\"name\":\"MIT License\"}]}]";
     assertEquals(expected, content);
   }
 
@@ -239,31 +201,28 @@ public class LicensesTaskTest {
 
   @Test
   public void testAddGooglePlayServiceLicenses() throws IOException {
-    File tempOutput = new File(licensesTask.getRawResourceDir(), "dependencies/groupC");
+    File outputFile = temporaryFolder.newFolder();
+    File tempOutput = new File(outputFile, "dependencies/groupC");
     tempOutput.mkdirs();
     createLicenseZip(tempOutput.getPath() + "play-services-foo-license.aar");
     File artifact = new File(tempOutput.getPath() + "play-services-foo-license.aar");
     licensesTask.addGooglePlayServiceLicenses(artifact);
 
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    String expected = "safeparcel" + LINE_BREAK + "JSR 305" + LINE_BREAK;
+    licensesTask.writeExtendedDependenciesJson();
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()), UTF_8);
+    String expected = "[{\"artifactInfo\":null,\"name\":\"safeparcel\",\"licenses\":[{\"text\":\"safeparcel\",\"url\":null,\"name\":null}]},{\"artifactInfo\":null,\"name\":\"JSR 305\",\"licenses\":[{\"text\":\"JSR 305\",\"url\":null,\"name\":null}]}]";
     assertEquals(expected, content);
-    assertThat(licensesTask.googleServiceLicenses.size(), is(2));
-    assertTrue(licensesTask.googleServiceLicenses.contains("safeparcel"));
-    assertTrue(licensesTask.googleServiceLicenses.contains("JSR 305"));
-    assertThat(licensesTask.licensesMap.size(), is(2));
-    assertTrue(licensesTask.licensesMap.containsKey("safeparcel"));
-    assertTrue(licensesTask.licensesMap.containsKey("JSR 305"));
   }
 
   @Test
   public void testAddGooglePlayServiceLicenses_withoutDuplicate() throws IOException {
-    File groupC = new File(licensesTask.getRawResourceDir(), "dependencies/groupC");
+    File outputFile = temporaryFolder.newFolder();
+    File groupC = new File(outputFile, "dependencies/groupC");
     groupC.mkdirs();
     createLicenseZip(groupC.getPath() + "/play-services-foo-license.aar");
     File artifactFoo = new File(groupC.getPath() + "/play-services-foo-license.aar");
 
-    File groupD = new File(licensesTask.getRawResourceDir(), "dependencies/groupD");
+    File groupD = new File(outputFile, "dependencies/groupD");
     groupD.mkdirs();
     createLicenseZip(groupD.getPath() + "/play-services-bar-license.aar");
     File artifactBar = new File(groupD.getPath() + "/play-services-bar-license.aar");
@@ -271,15 +230,10 @@ public class LicensesTaskTest {
     licensesTask.addGooglePlayServiceLicenses(artifactFoo);
     licensesTask.addGooglePlayServiceLicenses(artifactBar);
 
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    String expected = "safeparcel" + LINE_BREAK + "JSR 305" + LINE_BREAK;
+    licensesTask.writeExtendedDependenciesJson();
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()), UTF_8);
+    String expected = "[{\"artifactInfo\":null,\"name\":\"safeparcel\",\"licenses\":[{\"text\":\"safeparcel\",\"url\":null,\"name\":null}]},{\"artifactInfo\":null,\"name\":\"JSR 305\",\"licenses\":[{\"text\":\"JSR 305\",\"url\":null,\"name\":null}]}]";
     assertEquals(expected, content);
-    assertThat(licensesTask.googleServiceLicenses.size(), is(2));
-    assertTrue(licensesTask.googleServiceLicenses.contains("safeparcel"));
-    assertTrue(licensesTask.googleServiceLicenses.contains("JSR 305"));
-    assertThat(licensesTask.licensesMap.size(), is(2));
-    assertTrue(licensesTask.licensesMap.containsKey("safeparcel"));
-    assertTrue(licensesTask.licensesMap.containsKey("JSR 305"));
   }
 
   private void createLicenseZip(String name) throws IOException {
@@ -297,32 +251,6 @@ public class LicensesTaskTest {
   }
 
   @Test
-  public void testAppendLicense() throws IOException {
-    licensesTask.appendDependency(
-        new LicensesTask.Dependency("license1", "license1"),
-        "test".getBytes(UTF_8));
-
-    String expected = "test" + LINE_BREAK;
-    String content = new String(Files.readAllBytes(licensesTask.getLicenses().toPath()), UTF_8);
-    assertTrue(licensesTask.licensesMap.containsKey("license1"));
-    assertEquals(expected, content);
-  }
-
-  @Test
-  public void testWriteMetadata() throws IOException {
-    LicensesTask.Dependency dep1 = new LicensesTask.Dependency("test:foo", "Dependency 1");
-    LicensesTask.Dependency dep2 = new LicensesTask.Dependency("test:bar", "Dependency 2");
-    licensesTask.licensesMap.put(dep1.getKey(), dep1.buildLicensesMetadata("0:4"));
-    licensesTask.licensesMap.put(dep2.getKey(), dep2.buildLicensesMetadata("6:10"));
-    licensesTask.writeMetadata();
-
-    String expected = "0:4 Dependency 1" + LINE_BREAK + "6:10 Dependency 2" + LINE_BREAK;
-    String content = new String(Files.readAllBytes(licensesTask.getLicensesMetadata().toPath()),
-        UTF_8);
-    assertEquals(expected, content);
-  }
-
-  @Test
   public void testDependenciesWithNameDuplicatedNames() throws IOException, URISyntaxException {
     File deps6 = getResourceFile("dependencies/groupF/deps6.pom");
     String name1 = "deps6";
@@ -336,9 +264,11 @@ public class LicensesTaskTest {
     String version2 = "1";
     licensesTask.addLicensesFromPom(deps7, new ArtifactInfo(group2, name2, version2));
 
-    assertThat(licensesTask.licensesMap.size(), is(2));
-    assertTrue(licensesTask.licensesMap.containsKey("groupF:deps6"));
-    assertTrue(licensesTask.licensesMap.containsKey("groupF:deps7"));
+    licensesTask.writeExtendedDependenciesJson();
+    String expected = "[{\"artifactInfo\":{\"group\":\"groupF\",\"version\":\"1\",\"name\":\"deps6\"},\"name\":\"Collision Test\",\"licenses\":[{\"text\":null,\"url\":\"http://www.opensource.org/licenses/mit-license.php\",\"name\":\"MIT License\"}]},{\"artifactInfo\":{\"group\":\"groupF\",\"version\":\"1\",\"name\":\"deps7\"},\"name\":\"Collision Test\",\"licenses\":[{\"text\":null,\"url\":\"https://www.apache.org/licenses/LICENSE-2.0\",\"name\":\"Apache License 2.0\"}]}]";
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()),
+            UTF_8);
+    assertEquals(expected, content);
   }
 
   @Test
@@ -353,11 +283,10 @@ public class LicensesTaskTest {
 
     licensesTask.action();
 
-    String line;
-    try (BufferedReader reader = new BufferedReader(new FileReader(licensesTask.getLicenses()))) {
-      line = reader.readLine();
-    }
-    assertEquals(line, LicensesTask.ABSENT_DEPENDENCY_TEXT);
+    String expected = "[{\"artifactInfo\":null,\"name\":\"Debug License Info\",\"licenses\":[{\"text\":\"Licenses are only provided in build variants (e.g. release) where the Android Gradle Plugin generates an app dependency list.\",\"url\":null,\"name\":null}]}]";
+    String content = new String(Files.readAllBytes(licensesTask.getExtendedDependenciesJson().toPath()),
+            UTF_8);
+    assertEquals(expected, content);
   }
 
 }

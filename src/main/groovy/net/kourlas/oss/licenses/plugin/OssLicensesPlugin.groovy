@@ -43,12 +43,6 @@ class OssLicensesPlugin implements Plugin<Project> {
                 }.get()
                 logger.debug("Created task ${dependencyTask.name}")
 
-                def resourceBaseDir = new File(baseDir, "/res")
-                def rawResourceDir = new File(resourceBaseDir, "/raw")
-                def licensesFile = new File(rawResourceDir, "third_party_licenses")
-                def licensesMetadataFile = new File(rawResourceDir,
-                        "third_party_license_metadata")
-
                 def extendedDependenciesJson = new File(baseDir,
                         "dependencies_with_licenses.json")
 
@@ -58,9 +52,6 @@ class OssLicensesPlugin implements Plugin<Project> {
                     markNotCompatibleWithConfigurationCache(it)
                     it.dependenciesJson.set(dependencyTask.dependenciesJson)
                     it.extendedDependenciesJson = extendedDependenciesJson
-                    it.rawResourceDir = rawResourceDir
-                    it.licenses = licensesFile
-                    it.licensesMetadata = licensesMetadataFile
                 }.get()
                 logger.debug("Created task ${licenseTask.name}")
 
@@ -72,8 +63,6 @@ class OssLicensesPlugin implements Plugin<Project> {
                     it.dependenciesJson = dependenciesJson
                     it.extendedDependenciesJson = extendedDependenciesJson
                     it.dependencyDir = baseDir
-                    it.licensesFile = licensesFile
-                    it.metadataFile = licensesMetadataFile
                     it.licensesDir = rawResourceDir
                 }.get()
                 logger.debug("Created task ${cleanupTask.name}")
