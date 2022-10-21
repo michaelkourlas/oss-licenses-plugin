@@ -1,5 +1,6 @@
 /**
  * Copyright 2018 Google LLC
+ * Modifications copyright (C) 2022 Michael Kourlas
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +21,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Task to clean up the generated dependency.json, third_party_licenses and
- * third_party_license_metadata files.
+ * Task to clean up the generated dependency.json and
+ * dependencies_with_licenses.json files.
  */
 class LicensesCleanUpTask extends DefaultTask {
 

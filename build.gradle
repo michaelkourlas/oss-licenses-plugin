@@ -35,6 +35,13 @@ publishing {
             pom {
                 name = 'OSS Licenses Gradle Plugin'
                 description = 'Fork of Google\'s OSS Licenses Gradle Plugin.'
+                url = 'https://github.com/michaelkourlas/oss-licenses-plugin'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
             }
         }
     }

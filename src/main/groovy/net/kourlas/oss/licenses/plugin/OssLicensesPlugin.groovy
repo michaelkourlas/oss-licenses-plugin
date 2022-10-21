@@ -1,5 +1,6 @@
 /**
  * Copyright 2018 Google LLC
+ * Modifications copyright (C) 2022 Michael Kourlas
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +18,6 @@
 package net.kourlas.oss.licenses.plugin
 
 import com.android.build.api.artifact.SingleArtifact
-import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
