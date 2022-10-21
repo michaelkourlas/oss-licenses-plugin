@@ -15,10 +15,6 @@
 
 package net.kourlas.oss.licenses.plugin;
 
-import static org.junit.Assert.assertFalse;
-
-import java.io.File;
-import java.io.IOException;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.Rule;
@@ -27,33 +23,38 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertFalse;
+
 /** Tests for {@link LicensesCleanUpTask} */
 @RunWith(JUnit4.class)
 public class LicensesCleanUpTaskTest {
 
-  @Rule
-  public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  @Test
-  public void testAction() throws IOException {
-    File testDir = temporaryFolder.newFolder();
+    @Test
+    public void testAction() throws IOException {
+        File testDir = temporaryFolder.newFolder();
 
-    File dependencyDir = new File(testDir, "dependency");
-    dependencyDir.mkdir();
+        File dependencyDir = new File(testDir, "dependency");
+        dependencyDir.mkdir();
 
-    File dependencyFile = new File(dependencyDir, "dependency.json");
+        File dependencyFile = new File(dependencyDir, "dependency.json");
 
-    File extendedDependenciesJson = new File(testDir, "dependencies-with-licenses.json");
+        File extendedDependenciesJson = new File(testDir, "dependencies-with-licenses.json");
 
-    Project project = ProjectBuilder.builder().withProjectDir(testDir).build();
-    LicensesCleanUpTask task =
-        project.getTasks().create("licensesCleanUp", LicensesCleanUpTask.class);
-    task.dependencyDir = dependencyDir;
-    task.dependenciesJson = dependencyFile;
-    task.extendedDependenciesJson = extendedDependenciesJson;
+        Project project = ProjectBuilder.builder().withProjectDir(testDir).build();
+        LicensesCleanUpTask task =
+                project.getTasks().create("licensesCleanUp", LicensesCleanUpTask.class);
+        task.dependencyDir = dependencyDir;
+        task.dependenciesJson = dependencyFile;
+        task.extendedDependenciesJson = extendedDependenciesJson;
 
-    task.action();
-    assertFalse(task.dependenciesJson.exists());
-    assertFalse(task.dependencyDir.exists());
-  }
+        task.action();
+        assertFalse(task.dependenciesJson.exists());
+        assertFalse(task.dependencyDir.exists());
+    }
 }

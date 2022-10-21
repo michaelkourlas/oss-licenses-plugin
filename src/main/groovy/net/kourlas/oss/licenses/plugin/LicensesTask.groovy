@@ -109,10 +109,10 @@ abstract class LicensesTask extends DefaultTask {
 
     private void addDebugLicense() {
         extendedArtifactInfoSet.add(
-            new ExtendedArtifactInfo(
-                ABSENT_DEPENDENCY_KEY,
-                null,
-                [new LicenseInfo(null, null, ABSENT_DEPENDENCY_TEXT)].toSet()))
+                new ExtendedArtifactInfo(
+                        ABSENT_DEPENDENCY_KEY,
+                        null,
+                        [new LicenseInfo(null, null, ABSENT_DEPENDENCY_TEXT)].toSet()))
     }
 
     protected void initExtendedDependenciesJson() {
@@ -172,10 +172,10 @@ abstract class LicensesTask extends DefaultTask {
                             lengthValue)
                     licenses.add(key)
                     extendedArtifactInfoSet.add(
-                        new ExtendedArtifactInfo(
-                            key,
-                            null,
-                            [new LicenseInfo(null, null, new String(content, UTF_8))].toSet()))
+                            new ExtendedArtifactInfo(
+                                    key,
+                                    null,
+                                    [new LicenseInfo(null, null, new String(content, UTF_8))].toSet()))
                 }
             }
         }
@@ -240,18 +240,18 @@ abstract class LicensesTask extends DefaultTask {
                 licenses.add(new LicenseInfo(licenseName, licenseUrl, null))
             }
             extendedArtifactInfoSet.add(
-                new ExtendedArtifactInfo(
-                    libraryName,
-                    artifactInfo,
-                    licenses))
+                    new ExtendedArtifactInfo(
+                            libraryName,
+                            artifactInfo,
+                            licenses))
         } else {
             String licenseName = rootNode.licenses.license.name
             String licenseUrl = rootNode.licenses.license.url
             extendedArtifactInfoSet.add(
-                new ExtendedArtifactInfo(
-                    libraryName,
-                    artifactInfo,
-                    [new LicenseInfo(licenseName, licenseUrl, null)].toSet()))
+                    new ExtendedArtifactInfo(
+                            libraryName,
+                            artifactInfo,
+                            [new LicenseInfo(licenseName, licenseUrl, null)].toSet()))
         }
     }
 

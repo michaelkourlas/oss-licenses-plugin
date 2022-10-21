@@ -15,14 +15,15 @@
 
 package net.kourlas.oss.licenses.plugin;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test for {@link LicensesTask#isGoogleServices(String)}
@@ -30,23 +31,23 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class GoogleServicesLicenseTest {
 
-  @Parameter(0)
-  public String inputGroup;
-  @Parameter(1)
-  public Boolean expectedResult;
+    @Parameter(0)
+    public String inputGroup;
+    @Parameter(1)
+    public Boolean expectedResult;
 
-  @Parameters
-  public static Iterable<Object[]> data() {
-    return Arrays.asList(
-        new Object[][]{
-            {"com.google.android.gms", true},
-            {"com.google.firebase", true},
-            {"com.example", false},
-        });
-  }
+    @Parameters
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(
+                new Object[][]{
+                        {"com.google.android.gms", true},
+                        {"com.google.firebase", true},
+                        {"com.example", false},
+                });
+    }
 
-  @Test
-  public void test() {
-    assertEquals(expectedResult, LicensesTask.isGoogleServices(inputGroup));
-  }
+    @Test
+    public void test() {
+        assertEquals(expectedResult, LicensesTask.isGoogleServices(inputGroup));
+    }
 }
