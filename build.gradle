@@ -17,10 +17,25 @@ dependencies {
     testImplementation 'com.google.code.gson:gson:2.8.9'
 }
 
-group = 'net.kourlas'
-version = '0.0.1'
-
 repositories {
     google()
     mavenCentral()
+}
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'net.kourlas'
+            artifactId = 'oss-licenses-plugin'
+            version = "0.0.2"
+            from components.java
+
+            pom {
+                name = 'OSS Licenses Gradle Plugin'
+                description = 'Fork of Google\'s OSS Licenses Gradle Plugin.'
+            }
+        }
+    }
 }
