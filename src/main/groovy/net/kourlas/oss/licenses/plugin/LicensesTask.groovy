@@ -19,6 +19,7 @@ package net.kourlas.oss.licenses.plugin
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import groovy.util.XmlSlurper
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
